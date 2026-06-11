@@ -1,11 +1,13 @@
 const express = require('express');
 const path = require('path');
-const colors = require('colors');
 const methodOverride = require('method-override');
 const mongoose = require('mongoose');
 const engine = require('ejs-mate');
 
 const Campground = require('./models/campground');
+
+const eventLogger = require('./middleware/eventLogger');
+const dbLogger = require('./utils/dbLogger')
 
 mongoose.connect('mongodb://127.0.0.1:27017/camp-reviews', {});
 
@@ -14,6 +16,7 @@ db.on('error', console.error.bind(console, 'conection error:'));
 db.once('open', () => {
     console.log("Database Connected!")
 });
+
 
 const app = express();
 const port = 3232;
@@ -27,10 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
-app.use((req, res, next) => {
-    eventLogger(req, res);
-    next();
-});
+app.use(eventLogger);
 
 app.get('/', (req, res) => {
     res.render('home', { pageTitle: 'Home'});
@@ -49,8 +49,7 @@ app.post('/campgrounds', async (req, res) => {
     const newCamp =  new Campground(req.body.campground);
     await newCamp.save()
         .then(() => {
-            req.body = { dbMethod: 'DB INFO', dbResource: `Campground Created. ID: ${newCamp._id}` }; 
-            eventLogger(req, res, dbLog=true);
+            dbLogger('DB INFO', `Campground Created. ID: ${newCamp._id}`);
             res.redirect(`campgrounds/${newCamp._id}`);
         })
         .catch((err) => {
@@ -70,8 +69,7 @@ app.delete('/campgrounds/:id', async (req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id)
         .then(() => {
-            req.body = { dbMethod: 'DB INFO', dbResource: `Campground Deleted. ID: ${id}` }; 
-            eventLogger(req, res, dbLog=true);
+            dbLogger('DB INFO', `Campground Deleted. ID: ${id}`)
             res.redirect('/campgrounds');
         })
         .catch((err) => {
@@ -86,13 +84,13 @@ app.put('/campgrounds/:id', async (req, res) => {
     const campground = req.body.campground;
     await Campground.findByIdAndUpdate(id, campground)
         .then((msg) => {
-            req.body = { dbMethod: 'DB INFO', dbResource: `Campground Updated. ID: ${id}` }; 
-            eventLogger(req, res, dbLog=true);
+            dbLogger('DB INFO', `Campground Updated. ID: ${id}`);
             res.redirect(`/campgrounds/${id}`);
         })
         .catch((err) => {
             console.log('Uh Oh! Something went wrong trying to update.');
             console.log(`ID: ${id}`);
+            console.log(err);
             res.send('Whoops!');
         });
 });
@@ -112,29 +110,3 @@ app.listen(port, () => {
 });
 
 
-// Event Logger Middleware
-colors.setTheme({
-    labelBox: ['blue', 'bold'],
-    label: ['green', 'bold'],
-    arrow: ['brightCyan'],
-});
-
-function eventLogger(req, res, dbLog=false) {
-    const timeFormat = new Date().toLocaleString('en-US', {
-        weekday: 'short', 
-        day: '2-digit',   
-        month: 'short',   
-        hour: '2-digit',  
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-    });
-    const timestamp = timeFormat.replace(/,/g, '');
-
-    if (!dbLog) {
-        console.log(`${`[${timestamp.label}][${req.method.label}]`.labelBox} ${`\t❱❱❱`.arrow} ${req.url}`);
-    } else {
-        console.log(`${`[${timestamp.label}][${req.body.dbMethod.label}]`.labelBox} ${`\t❱❱❱`.arrow} ${req.body.dbResource}`);
-    }
-
-}
