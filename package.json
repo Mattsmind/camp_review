@@ -1,0 +1,26 @@
+{
+  "name": "yapcamp",
+  "version": "0.0.1",
+  "description": "Camp Review App",
+  "keywords": [
+    "camping",
+    "camp",
+    "reviews",
+    "comments"
+  ],
+  "license": "ISC",
+  "author": "Matt Zeilinger",
+  "type": "commonjs",
+  "main": "appt.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "colors": "^1.4.0",
+    "ejs": "^6.0.1",
+    "ejs-mate": "^4.0.0",
+    "express": "^5.2.1",
+    "method-override": "^3.0.0",
+    "mongoose": "^9.6.3"
+  }
+}
