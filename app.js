@@ -1,43 +1,42 @@
 const express = require('express');
+const app = express();
+const { requestLogger, errorLogger } = require('./middleware/eventLogger');
+const globalErrorHandler = require('./middleware/errorMiddleware');
+
 const path = require('path');
 const methodOverride = require('method-override');
-const mongoose = require('mongoose');
 const engine = require('ejs-mate');
 
 const Campground = require('./models/campground');
-
-const eventLogger = require('./middleware/eventLogger');
-const dbLogger = require('./utils/dbLogger')
-
-mongoose.connect('mongodb://127.0.0.1:27017/camp-reviews', {});
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'conection error:'));
-db.once('open', () => {
-    console.log("Database Connected!")
-});
-
-
-const app = express();
-const port = 3232;
+const AppError = require('./utils/AppError');
 
 app.engine('ejs', engine)
 
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(requestLogger);
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(methodOverride('_method'));
 
-app.use(eventLogger);
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/favicon.ico', (req, res) => {
+    res.status(204).end();
+});
 
 app.get('/', (req, res) => {
     res.render('home', { pageTitle: 'Home'});
 });
 
-app.get('/campgrounds', async (req, res) => {
+app.get('/campgrounds', async (req, res, next) => {
     const campgrounds = await Campground.find({});
+
+    if (!campgrounds) {
+        return next(new AppError('Error Loading Campground Index.', 500))
+    }
+
     res.render('campgrounds/index', { pageTitle: 'All Campgrounds', campgrounds });
 });
 
@@ -45,68 +44,63 @@ app.get('/campgrounds/new', (req, res) => {
     res.render('campgrounds/new', { pageTitle: 'Create New' })
 });
 
-app.post('/campgrounds', async (req, res) => {
+app.post('/campgrounds', async (req, res, next) => {
     const newCamp =  new Campground(req.body.campground);
-    await newCamp.save()
-        .then(() => {
-            dbLogger('DB INFO', `Campground Created. ID: ${newCamp._id}`);
-            res.redirect(`campgrounds/${newCamp._id}`);
-        })
-        .catch((err) => {
-            console.log('Something has gone wrong while creating new campground.');
-            console.log(err);
-            res.send("Whoopsie!!!");
-        });
+    const createCamp = await newCamp.save();
+
+    res.redirect(`/campgrounds/${newCamp._id}`);
 });
 
-app.get('/campgrounds/:id', async (req, res) => {
+app.get('/campgrounds/:id', async (req, res, next) => {
     const { id } = req.params;
     const campground = await Campground.findById(id);
+
+    if (!campground) {
+        return next(new AppError('That campground could not be found', 404));
+    }
+
     res.render('campgrounds/details', { pageTitle: campground.title, campground });
 });
 
-app.delete('/campgrounds/:id', async (req, res) => {
+app.delete('/campgrounds/:id', async (req, res, next) => {
     const { id } = req.params;
-    await Campground.findByIdAndDelete(id)
-        .then(() => {
-            dbLogger('DB INFO', `Campground Deleted. ID: ${id}`)
-            res.redirect('/campgrounds');
-        })
-        .catch((err) => {
-            console.log('Uh Oh! Something has gone wrong trying to delete.');
-            console.log(err);
-            res.send('Whoops!');
-        });
+    const deleteCamp = await Campground.findByIdAndDelete(id)
+
+    if (!deleteCamp) {
+        return next(new AppError('The campground could not be found.', 404))
+    }
+    
+    res.redirect('/campgrounds');
 });
 
-app.put('/campgrounds/:id', async (req, res) => {
+app.put('/campgrounds/:id', async (req, res, next) => {
     const { id } = req.params;
     const campground = req.body.campground;
-    await Campground.findByIdAndUpdate(id, campground)
-        .then((msg) => {
-            dbLogger('DB INFO', `Campground Updated. ID: ${id}`);
-            res.redirect(`/campgrounds/${id}`);
-        })
-        .catch((err) => {
-            console.log('Uh Oh! Something went wrong trying to update.');
-            console.log(`ID: ${id}`);
-            console.log(err);
-            res.send('Whoops!');
-        });
+    const updatedCamp = await Campground.findByIdAndUpdate(id, campground, { runValidators: true });
+
+    if (!updatedCamp) {
+        return next(new AppError('Could not find the camp to update!', 404));
+    }
+
+    res.redirect(`/campgrounds/${id}`);
 });
 
-app.get('/campgrounds/:id/edit', async (req, res) => {
+app.get('/campgrounds/:id/edit', async (req, res, next) => {
     const { id } = req.params;
     const updateCamp = await Campground.findById(id);
+
+    if (!updateCamp) {
+        return next(new AppError('The campground you want to update, could not be found.', 404));
+    }
+
     res.render('campgrounds/update', { pageTitle: 'Edit & Update', campground: updateCamp });
 });
 
-app.use((req, res) => {
-    res.status(404).render('404', { pageTitle: '404 NOT FOUND', resource: req.url });
+app.all(/.*/, (req, res, next) => {
+    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-app.listen(port, () => {
-    console.log(`SERVER UP: http://127.0.0.1:${port}`);
-});
+app.use(errorLogger);
+app.use(globalErrorHandler);
 
-
+module.exports = app;

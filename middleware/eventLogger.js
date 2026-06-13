@@ -1,9 +1,26 @@
 const { getTimestamp } = require('../utils/logStyles');
 
-const eventLogger = function (req, res, next) {
+const requestLogger = function (req, res, next) {
     const timestamp = getTimestamp();
     console.log(`${`[${timestamp.label}][${req.method.label}]`.labelBox} ${`\t❱❱❱`.arrow} ${req.url}`);
     next();
 }
 
-module.exports = eventLogger;
+const errorLogger = function (err, req, res, next) {
+    const timestamp = getTimestamp();
+
+    console.log(
+        `${`[${timestamp.label}][ERROR]`.labelBox} ${`\t💥💥💥`.arrow} ${req.method} ${req.url} ➔ ${err.message}`
+    );
+
+    if (err.stack) {
+        console.error(err.stack);
+    }
+
+    next(err);
+};
+
+module.exports = {
+    requestLogger,
+    errorLogger
+};
