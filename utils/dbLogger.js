@@ -12,11 +12,11 @@ const dbLoggingPlugin = function (schema) {
     schema.pre('save', function() {
         const timestamp = getTimestamp();
         const dbMethod = this.isNew ? 'CREATE' : 'SAVE'
-        const dbResource = this.construtor.modelName;
+        const dbResource = this.constructor.modelName;
 
         console.log(`${`[${timestamp.label}][${dbMethod.label}]`.labelBox} ${`\t❱❱❱`.arrow} ${dbResource}`);      
     });
-
+    
 }
 
 module.exports = dbLoggingPlugin;

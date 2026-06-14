@@ -2,36 +2,98 @@
     <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-12">
         <h1 class="h1 border-bottom pb-1 mb-3">Edit <%= campground.title %></h1>
         
-        <form action="<%= `/campgrounds/${campground._id}?_method=PUT` %>" method="post">
-            <div class="mb-3">
+        <form 
+            action="<%= `/campgrounds/${campground._id}?_method=PUT` %>" 
+            method="post" 
+            class="needs-validation" 
+            novalidate>
+
+            <div class="mb-3 has-validation">
                 <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" name="campground[title]" value="<%= campground.title %>">
+                <input 
+                    type="text" 
+                    id="title"
+                    class="form-control"  
+                    name="campground[title]" 
+                    value="<%= campground.title %>"
+                    required>
+
+                <div class="invalid-feedback">
+                    Please enter a title for the campground.
+                </div>
             </div>
             <div class="mb-3">
                 <label for="location" class="form-label">Location</label>
-                <input type="text" class="form-control" name="campground[location]" id="location" value="<%= campground.location %>">
+                <input 
+                    type="text" 
+                    id="location"
+                    class="form-control" 
+                    name="campground[location]"  
+                    value="<%= campground.location %>"
+                    required>
+
+                <div class="invalid-feedback">
+                    Please enter a location for the campground.
+                </div>
             </div>
             <div class="mb-3">
                 <label for="image" class="form-label">Image URL</label>
-                <input type="text" class="form-control" name="campground[image]" id="image" value="<%= campground.image %>">    
+                <input 
+                    type="url" 
+                    class="form-control" 
+                    name="campground[image]" 
+                    id="image" 
+                    value="<%= campground.image %>"
+                    required>
+
+                <div class="invalid-feedback">
+                    Valid image URL is required (inlcuding http:// or https://).
+                </div>
             </div>
             <div class="mb-3">
                 <label for="price" class="form-label">Price</label>
-                <input type="number" class="form-control" name="campground[price]" id="price" step="any" value="<%= campground.price %>">
+                <div class="input-group has-validation">
+                    <span class="input-group-text" id="priceInput">$</span>
+                    <input 
+                        type="number" 
+                        id="price" 
+                        class="form-control" 
+                        name="campground[price]" 
+                        aria-describedby="priceInput" 
+                        min="0.00" 
+                        step="0.01"
+                        value="<%= campground.price %>" 
+                        required>
+                    
+                    <div class="invalid-feedback">
+                        Please enter a valid price for the campground.
+                    </div>  
+                </div>
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" name="campground[description]" id="description" rows="7" style="resize: none;"><%= campground.description %></textarea>
+                <textarea 
+                    class="form-control" 
+                    name="campground[description]" 
+                    id="description" 
+                    rows="7" 
+                    style="resize: none;"
+                    required><%= campground.description %></textarea>
+            
+                <div class="invalid-feedback">
+                    Please enter a description for the campground.
+                </div>
             </div>
 
             <div class="row mt-3">
-                <div class="col-md-6">
-                    <button class="btn btn-success form-control">Submit Edits</button>
+                <div class="col-md-6 d-grid">
+                    <button class="btn btn-success">Submit Edits</button>
                 </div>
-                <div class="col-md-6">
-                    <a href="/campgrounds" class="btn btn-danger form-control">Cancel</a>
+                <div class="col-md-6 d-grid">
+                    <a href="/campgrounds" class="btn btn-danger">Cancel</a>
                 </div>       
             </div>  
         </form>
-    </div>    
+    </div>
+    <script src="/js/formValidation.js"></script>    
    

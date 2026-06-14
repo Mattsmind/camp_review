@@ -2,38 +2,97 @@
     <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-12">
         <h1 class="h1 border-bottom pb-1 mb-3">Create New Campground</h1>
         
-        <form action="/campgrounds" method="post">
-            <div class="mb-3">
+        <form 
+            action="/campgrounds" 
+            method="post" 
+            class="needs-validation" 
+            novalidate>
+            
+            <div class="mb-3 has-validation">
                 <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" name="campground[title]" placeholder="Campground Name">
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="title" 
+                    name="campground[title]" 
+                    placeholder="Campground Name" 
+                    required>
+
+                <div class="invalid-feedback">
+                    Please enter a title for the campground.
+                </div>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 has-validation">
                 <label for="location" class="form-label">Location</label>
-                <input type="text" class="form-control" name="campground[location]" id="location" placeholder="Somewhereville, USA">
+                <input 
+                    type="text" 
+                    id="location"
+                    class="form-control" 
+                    name="campground[location]"  
+                    placeholder="Somewhereville, USA" 
+                    required>
+
+                <div class="invalid-feedback">
+                    Please enter a location for the campground.
+                </div>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 has-validation">
                 <label for="image" class="form-label">Image URL</label>
-                <input type="text" class="form-control" name="campground[image]" id="image" placeholder="http://wheremyimageis.com/thisimageismine.jpg">    
+                <input 
+                    type="url" 
+                    id="image"
+                    class="form-control" 
+                    name="campground[image]"  
+                    placeholder="http://wheremyimageis.com/thisimageismine.jpg" 
+                    required>
+
+                <div class="invalid-feedback">
+                    Valid image URL is required (inlcuding http:// or https://).
+                </div>
             </div>
             <div class="mb-3">
                 <label for="price" class="form-label">Price</label>
-                <div class="input-group flex-nowrap">
+                <div class="input-group has-validation">
                     <span class="input-group-text" id="priceInput">$</span>
-                    <input type="number" id="price" class="form-control" placeholder="0.00" name="campground[price]" aria-describedby="priceInput" step="0.01">
+                    <input 
+                        type="number" 
+                        id="price" 
+                        class="form-control" 
+                        name="campground[price]" 
+                        placeholder="0.00"
+                        aria-describedby="priceInput" 
+                        min="0.00" 
+                        step="0.01" 
+                        required>
+                    
+                    <div class="invalid-feedback">
+                        Please enter a valid price for the campground.
+                    </div>  
                 </div>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 has-validation">
                 <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" name="campground[description]" id="description" rows="7" style="resize: none;" placeholder="Your description of the campground."></textarea>
+                <textarea 
+                    class="form-control" 
+                    name="campground[description]" 
+                    id="description" 
+                    rows="7" 
+                    style="resize: none;" 
+                    placeholder="Your description of the campground." 
+                    required></textarea>
+
+                <div class="invalid-feedback">
+                    Please enter a description for the campground.
+                </div>
             </div>
             <div class="row mt-3">
-                <div class="col-md-6">
-                    <button class="btn btn-success form-control">Create New</button>
+                <div class="col-md-6 d-grid">
+                    <button class="btn btn-success">Create New</button>
                 </div>
-                <div class="col-md-6">
-                    <a href="/campgrounds" class="btn btn-danger form-control">Cancel</a>
+                <div class="col-md-6 d-grid">
+                    <a href="/campgrounds" class="btn btn-danger">Cancel</a>
                 </div>       
             </div>  
         </form>
     </div>    
-   
+    <script src="/js/formValidation.js"></script>
