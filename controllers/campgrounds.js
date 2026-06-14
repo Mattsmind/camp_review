@@ -1,5 +1,5 @@
-const Campground = require('./models/campground');
-const AppError = require('./utils/AppError');
+const Campground = require('../models/campground');
+const AppError = require('../utils/AppError');
 
 module.exports.index = async (req, res, next) => {
     const campgrounds = await Campground.find({});
