@@ -1,0 +1,21 @@
+<% layout('layouts/boilerplate') %>
+    <div class="row mt-5">
+        <div class="col-md-8 offset-md-2">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Status Code: <%= statusCode %></h4>
+                <p><%= message %></p>
+            </div>
+
+            <% if (isDev && stack) { %>
+                <div class="card mt-4 border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">Stack Trace (Development Only)</h5>
+                    </div>
+                    <div class="card-body bg-dark text-light p-3">
+                        <pre class="mb-0" style="white-space: pre-wrap;"><code><%= stack %></code></pre>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
