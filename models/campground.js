@@ -2,14 +2,31 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const campgroundSchema = new Schema({
-    title: String,
+    title: {
+        type: String,
+        minlength: [4, 'Title must be at least 4 characters!'],
+        required: true
+    },
     image: {
         type: String,
-        default: `https://picsum.photos/400?random=${Math.random()}`
+        default: () => `https://picsum.photos/400?random=${Math.random()}`,
+        match: [/^https?:\/\/.+/, 'Please enter a valid HTTP or HTTPS URL'],
+        required: true
     },
-    price: Number,
-    description: String,
-    location: String
+    price: {
+        type: Number,
+        min: [0.01, 'Price must be greater than $0.00!'], 
+        required: true
+    },
+    description: {
+        type: String,
+        minlength: [10, 'Your Description is too short!'],
+        required: true
+    },
+    location: {
+        type: String,
+        required: true
+    }
 });
 
 module.exports = mongoose.model('Campground', campgroundSchema);
