@@ -3,7 +3,7 @@ const router = express.Router();
 const campgrounds = require('../controllers/campgrounds');
 
 const validateForm = require('../middleware/validateForm');
-const { campgroundSchema } = require('../schemas');
+const { campgroundSchema, objectIdSchema } = require('../schemas');
 
 router.route('/')
     .get(campgrounds.index)
@@ -12,9 +12,9 @@ router.route('/')
 router.get('/new', campgrounds.renderNewForm);
 
 router.route('/:id')
-    .get(campgrounds.showCampground)
+    .get(validateForm(objectIdSchema, 'params'), campgrounds.showCampground)
     .put(validateForm(campgroundSchema), campgrounds.updateCampground)
-    .delete(campgrounds.deleteCampground);
+    .delete(validateForm(objectIdSchema, 'params'), campgrounds.deleteCampground);
 
 router.get('/:id/edit', campgrounds.renderEditForm);
 

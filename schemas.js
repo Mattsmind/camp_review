@@ -10,4 +10,11 @@ const campgroundSchema = Joi.object({
     }).required()
 });
 
-module.exports = { campgroundSchema };
+const objectIdSchema = Joi.object({
+    id: Joi.string().hex().length(24).required()
+});
+
+module.exports = { 
+    campgroundSchema,
+    objectIdSchema
+};

@@ -1,8 +1,8 @@
 const AppError = require('../utils/AppError');
 
-const validateForm = (schema) => {
+const validateForm = (schema, source='body') => {
     return (req, res, next) => {
-        const { error } = schema.validate(req.body);
+        const { error } = schema.validate(req[source]);
 
         if (error) {
             const msg = error.details.map(el => el.message).join(', ');
