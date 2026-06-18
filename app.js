@@ -8,7 +8,7 @@ const { requestLogger, errorLogger } = require('./middleware/eventLogger');
 const globalErrorHandler = require('./middleware/errorMiddleware');
 const AppError = require('./utils/AppError')
 
-const campgroundRoutes = require('./routes/campgrounds');
+const motelRoutes = require('./routes/motels');
 
 app.engine('ejs', engine)
 app.set('view engine', 'ejs')
@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get( '/favicon.ico', (req, res) => res.status(204).end() );
 app.get('/', (req, res) => res.render('home', { pageTitle: 'Home'}) );
 
-app.use('/campgrounds', campgroundRoutes);
+app.use('/motels', motelRoutes);
 
 app.all(/.*/, (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

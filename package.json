@@ -1,12 +1,20 @@
 {
-  "name": "camp-review",
-  "version": "1.3.0",
-  "description": "Camp Review App",
+  "name": "vacancy-vibe",
+  "version": "2.0.0",
+  "description": "A vintage roadside motel review directory application.",
   "keywords": [
-    "camping",
-    "camp",
-    "reviews",
-    "comments"
+    "express",
+    "mongodb",
+    "mongoose",
+    "nodejs",
+    "full-stack",
+    "crud-app",
+    "rest-api",
+    "bootstrap5",
+    "vacancy-vibe",
+    "motel-directory",
+    "retro-travel",
+    "mvc-architecture"
   ],
   "license": "ISC",
   "author": "Matt Zeilinger",
