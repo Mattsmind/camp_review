@@ -1,0 +1,17 @@
+<% layout('layouts/boilerplate') %>
+    <h1 class="display-1 border-bottom pb-1 mb-3"><%= pageTitle %></h1>
+    
+    <div class="row">
+    <% for (let motel of motels) { %>
+        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 mb-3">
+            <div class="card h-100">
+                <img src="<%= motel.image %>" class="card-img-top object-fit-cover" style="height: 225px;" alt="<%= motel.title %>">
+                <div class="card-body d-flex flex-column">
+                    <h4 class="card-title fs-5 fw-lighter border-bottom text-truncate"><%= motel.title %></h4>
+                    <p class="card-text text-clamp mb-3"><%= motel.description %></p>
+                    <a href="<%= `/motels/${motel._id}` %>" class="btn btn-success mt-auto">Visit</a>
+                </div>
+            </div>
+        </div>
+    <% } %>    
+    </div>

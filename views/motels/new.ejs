@@ -1,0 +1,98 @@
+<% layout('layouts/boilerplate') %>
+    <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-12">
+        <h1 class="h1 border-bottom pb-1 mb-3">Create New Motel</h1>
+        
+        <form 
+            action="/motels" 
+            method="post" 
+            class="needs-validation" 
+            novalidate>
+            
+            <div class="mb-3 has-validation">
+                <label for="title" class="form-label">Title</label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="title" 
+                    name="motel[title]" 
+                    placeholder="Motel Name" 
+                    required>
+
+                <div class="invalid-feedback">
+                    Please enter a title for the motel.
+                </div>
+            </div>
+            <div class="mb-3 has-validation">
+                <label for="location" class="form-label">Location</label>
+                <input 
+                    type="text" 
+                    id="location"
+                    class="form-control" 
+                    name="motel[location]"  
+                    placeholder="Somewhereville, USA" 
+                    required>
+
+                <div class="invalid-feedback">
+                    Please enter a location for the motel.
+                </div>
+            </div>
+            <div class="mb-3 has-validation">
+                <label for="image" class="form-label">Image URL</label>
+                <input 
+                    type="url" 
+                    id="image"
+                    class="form-control" 
+                    name="motel[image]"  
+                    placeholder="http://wheremyimageis.com/thisimageismine.jpg" 
+                    required>
+
+                <div class="invalid-feedback">
+                    Valid image URL is required (inlcuding http:// or https://).
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <div class="input-group has-validation">
+                    <span class="input-group-text" id="priceInput">$</span>
+                    <input 
+                        type="number" 
+                        id="price" 
+                        class="form-control" 
+                        name="motel[price]" 
+                        placeholder="0.00"
+                        aria-describedby="priceInput" 
+                        min="0.00" 
+                        step="0.01" 
+                        required>
+                    
+                    <div class="invalid-feedback">
+                        Please enter a valid price for the motel.
+                    </div>  
+                </div>
+            </div>
+            <div class="mb-3 has-validation">
+                <label for="description" class="form-label">Description</label>
+                <textarea 
+                    class="form-control" 
+                    name="motel[description]" 
+                    id="description" 
+                    rows="7" 
+                    style="resize: none;" 
+                    placeholder="Your description of the motel." 
+                    required></textarea>
+
+                <div class="invalid-feedback">
+                    Please enter a description for the motel.
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6 d-grid">
+                    <button class="btn btn-success">Create New</button>
+                </div>
+                <div class="col-md-6 d-grid">
+                    <a href="/motels" class="btn btn-danger">Cancel</a>
+                </div>       
+            </div>  
+        </form>
+    </div>    
+    <script src="/js/formValidation.js"></script>

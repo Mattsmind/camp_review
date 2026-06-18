@@ -1,0 +1,32 @@
+<% layout('layouts/boilerplate') %>
+    <div class="row">
+        <div class="col border-bottom pb-1 mb-3">
+            <h1 class="display-3 mb-0"><%= motel.title %></h1>
+            <div class="ms-2">
+                <h4 class="h5"><%= motel.location %></h4>
+            </div>     
+        </div>
+    </div>    
+    <div class="row">
+        <div class="col-lg-4 col-12">
+            <img src="<%= motel.image %>" alt="<%= motel.title %>" class="img-fluid rounded">
+        </div>
+        <div class="col-lg-8 col-12">
+            <div class="mb-5">
+                <p class="lead"><%= motel.description %></p>
+            </div>
+            <div class="mb-3">
+                <span><strong>Price:</strong> $<%= motel.price %>/night</span>
+            </div>
+        </div>
+
+    </div>
+    <div class="row mt-4">
+        <div class="col">
+            <a class="btn btn-success" href="<%= `/motels/${motel._id}/edit` %>">Edit</a>
+            <form class="d-inline" method="post" action="<%= `/motels/${motel._id}?_method=DELETE` %>">
+                <button class="btn btn-danger">Delete</button>
+            </form>
+        </div>    
+    </div>
+

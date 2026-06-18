@@ -1,0 +1,68 @@
+const Motel = require('../models/motel');
+const AppError = require('../utils/AppError');
+
+module.exports.index = async (req, res, next) => {
+    const motels = await Motel.find({});
+
+    if (!motels) {
+        return next(new AppError('Error Loading Motel Index.', 500))
+    }
+
+    res.render('motels/index', { pageTitle: 'All Motels', motels });
+};
+
+module.exports.renderNewForm = (req, res) => {
+    res.render('motels/new', { pageTitle: 'Create New' })
+};
+
+module.exports.createMotel = async (req, res, next) => {
+    const newCamp =  new Motel(req.body.motel);
+    const createCamp = await newCamp.save();
+
+    res.redirect(`/motels/${newCamp._id}`);
+};
+
+module.exports.showMotel = async (req, res, next) => {
+    const { id } = req.params;
+    const motel = await Motel.findById(id);
+
+    if (!motel) {
+        return next(new AppError('That motel could not be found', 404));
+    }
+
+    res.render('motels/details', { pageTitle: motel.title, motel });
+};
+
+module.exports.renderEditForm = async (req, res, next) => {
+    const { id } = req.params;
+    const updateCamp = await Motel.findById(id);
+
+    if (!updateCamp) {
+        return next(new AppError('The motel you want to update, could not be found.', 404));
+    }
+
+    res.render('motels/update', { pageTitle: 'Edit & Update', motel: updateCamp });
+};
+
+module.exports.updateMotel = async (req, res, next) => {
+    const { id } = req.params;
+    const motel = req.body.motel;
+    const updatedCamp = await Motel.findByIdAndUpdate(id, motel, { runValidators: true });
+
+    if (!updatedCamp) {
+        return next(new AppError('Could not find the camp to update!', 404));
+    }
+
+    res.redirect(`/motels/${id}`);
+};
+
+module.exports.deleteMotel = async (req, res, next) => {
+    const { id } = req.params;
+    const deleteCamp = await Motel.findByIdAndDelete(id)
+
+    if (!deleteCamp) {
+        return next(new AppError('The motel could not be found.', 404))
+    }
+    
+    res.redirect('/motels');
+};

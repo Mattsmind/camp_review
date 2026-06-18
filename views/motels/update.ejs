@@ -1,0 +1,99 @@
+<% layout('layouts/boilerplate') %>
+    <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-12">
+        <h1 class="h1 border-bottom pb-1 mb-3">Edit <%= motel.title %></h1>
+        
+        <form 
+            action="<%= `/motels/${motel._id}?_method=PUT` %>" 
+            method="post" 
+            class="needs-validation" 
+            novalidate>
+
+            <div class="mb-3 has-validation">
+                <label for="title" class="form-label">Title</label>
+                <input 
+                    type="text" 
+                    id="title"
+                    class="form-control"  
+                    name="motel[title]" 
+                    value="<%= motel.title %>"
+                    required>
+
+                <div class="invalid-feedback">
+                    Please enter a title for the motel.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input 
+                    type="text" 
+                    id="location"
+                    class="form-control" 
+                    name="motel[location]"  
+                    value="<%= motel.location %>"
+                    required>
+
+                <div class="invalid-feedback">
+                    Please enter a location for the motel.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="image" class="form-label">Image URL</label>
+                <input 
+                    type="url" 
+                    class="form-control" 
+                    name="motel[image]" 
+                    id="image" 
+                    value="<%= motel.image %>"
+                    required>
+
+                <div class="invalid-feedback">
+                    Valid image URL is required (inlcuding http:// or https://).
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <div class="input-group has-validation">
+                    <span class="input-group-text" id="priceInput">$</span>
+                    <input 
+                        type="number" 
+                        id="price" 
+                        class="form-control" 
+                        name="motel[price]" 
+                        aria-describedby="priceInput" 
+                        min="0.00" 
+                        step="0.01"
+                        value="<%= motel.price %>" 
+                        required>
+                    
+                    <div class="invalid-feedback">
+                        Please enter a valid price for the motel.
+                    </div>  
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea 
+                    class="form-control" 
+                    name="motel[description]" 
+                    id="description" 
+                    rows="7" 
+                    style="resize: none;"
+                    required><%= motel.description %></textarea>
+            
+                <div class="invalid-feedback">
+                    Please enter a description for the motel.
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-6 d-grid">
+                    <button class="btn btn-success">Submit Edits</button>
+                </div>
+                <div class="col-md-6 d-grid">
+                    <a href="/motels" class="btn btn-danger">Cancel</a>
+                </div>       
+            </div>  
+        </form>
+    </div>
+    <script src="/js/formValidation.js"></script>    
+   
