@@ -1,0 +1,1394 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: VacancyVibe
+meta:
+  id: wrk_42e84443f04c495f80caa143d71c9a50
+  created: 1781651824697
+  modified: 1781651824697
+  description: ""
+collection:
+  - url: "{{ _.base_url }}"
+    name: 01 - Load Home
+    meta:
+      id: req_8ff3dc01148d429a9d13c1b010a1e6c1
+      created: 1781653318788
+      modified: 1781658750681
+      isPrivate: false
+      description: ""
+      sortKey: -1781653318788
+    method: GET
+    scripts:
+      afterResponse: |-
+        insomnia.test('Should return our home page with a 200!', () => {
+        	insomnia.expect(insomnia.response.code).to.equal(200);
+        });
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - name: Motels
+    meta:
+      id: fld_83d161bb9b0e4b889d281d5faa71b845
+      created: 1781652345525
+      modified: 1781757078706
+      sortKey: -1781652345525
+      description: ""
+    children:
+      - url: "{{ _.base_url }}/motels"
+        name: 01 - Load Motels Index
+        meta:
+          id: req_1b5707380a7f4a5f85a1bad5b9e09f04
+          created: 1781652550807
+          modified: 1781715032874
+          isPrivate: false
+          description: ""
+          sortKey: -1781652550807
+        method: GET
+        scripts:
+          afterResponse: |-
+            insomnia.test('Should Load Motels Index with Status 200', () => {
+            	insomnia.expect(insomnia.response.code).to.equal(200);
+            });
+
+            if (insomnia.response.code === 200) {
+            	const responseBody = insomnia.response.body.toString();
+            	
+            	try {
+            		const motels = JSON.parse(responseBody);
+            		if (motels && motels.length > 0) {
+            			insomnia.environment.set('active_show_id', motels[0]._id);
+            		}
+            	} catch (e) {
+            		const mongoIdMatch = responseBody.match(/[0-9a-fA-F]{24}/g);
+            		
+            		if (mongoIdMatch) {
+            			insomnia.environment.set('active_show_id', mongoIdMatch[0])
+            		}
+            	}
+            }
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/motels/{{ active_show_id }}"
+        name: 02 - Load Single Motel Details
+        meta:
+          id: req_036d8de5f29c4218b65f34ad9f33f296
+          created: 1781653566235
+          modified: 1781739301477
+          isPrivate: false
+          description: ""
+          sortKey: -1781652468050.5
+        method: GET
+        scripts:
+          afterResponse: |-
+            insomnia.test('Should Load single Motel with status 200', () => {
+            	insomnia.expect(insomnia.response.code).to.equal(200);
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - name: Create Operations
+        meta:
+          id: fld_1a4fa4949c024706b9a31c1d2413aaac
+          created: 1781652363623
+          modified: 1781757077582
+          sortKey: -1781652385294
+          description: ""
+        children:
+          - url: "{{ _.base_url }}/motels/new"
+            name: " 01 - Load Create New Form"
+            meta:
+              id: req_6b4256138e0f44edbe53a8f8ac6a85bd
+              created: 1781653523919
+              modified: 1781712422590
+              isPrivate: false
+              description: ""
+              sortKey: -1781653523919
+            method: GET
+            scripts:
+              afterResponse: |
+                insomnia.test('Should load form with status 200', () => {
+                	insomnia.expect(insomnia.response.code).to.equal(200);
+                });
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/motels"
+            name: 02 - Submit Valid Data
+            meta:
+              id: req_f16260d5843e47d5b2c9c5c75eafcf49
+              created: 1781653906240
+              modified: 1781734279769
+              isPrivate: false
+              description: ""
+              sortKey: -1781652979356
+            method: POST
+            body:
+              mimeType: application/json
+              text: >-
+                {
+                  "motel": {
+                    "title": "Neon Palms Motor Lodge",
+                    "location": "Detroit, MI",
+                    "price": 110,
+                    "description": "Authentic mid-century aesthetic with fully restored neon signage.",
+                    "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                  }
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            scripts:
+              afterResponse: >-
+                insomnia.test('Should return the newly created Motel with status
+                200', () => {
+                	insomnia.expect(insomnia.response.code).to.equal(200);
+                });
+
+
+                if (insomnia.response.code === 200) {
+                	const htmlBody = insomnia.response.body.toString();
+                	const idMatch = htmlBody.match(/\/motels\/([0-9a-fA-F]{24})/);
+                	
+                	if (idMatch && idMatch[1]) {
+                		const newId = idMatch[1];
+                		insomnia.environment.set('active_test_id', newId);
+                	} else {
+                		insomnia.test('🛑 SCRAPE FAILURE', () => {
+                            insomnia.expect.fail("Successfully loaded page, but could not locate the new 24-character Mongoose ID inside the rendered HTML source code.");
+                		});
+                	}
+                }
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - name: Validation Failures
+            meta:
+              id: fld_85882029887f4636925448434bf5db13
+              created: 1781652434793
+              modified: 1781757077583
+              sortKey: -1781652434793
+              description: ""
+            children:
+              - url: "{{ _.base_url }}/motels"
+                name: 01 - Empty Title
+                meta:
+                  id: req_6c4119501f254848ab9b9b50f46dea74
+                  created: 1781656354106
+                  modified: 1781728352211
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781656359297
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "",
+                        "location": "Detroit, MI",
+                        "price": 110,
+                        "description": "Authentic mid-century aesthetic with fully restored neon signage.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: |-
+                    insomnia.test('Title Empty. Should return 400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 04 - Empty Location
+                meta:
+                  id: req_7fe79c33e0af4e078e47af43dac078f9
+                  created: 1781656381442
+                  modified: 1781728276294
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781654941608
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Neon Palms Motor Lodge",
+                        "location": "",
+                        "price": 110,
+                        "description": "Authentic mid-century aesthetic with fully restored neon signage.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: |-
+                    insomnia.test('Location Empty. Should return 400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 06  - Price of  Zero
+                meta:
+                  id: req_dbef9bd1bca14a71b0ba1cc8ff02db81
+                  created: 1781656401223
+                  modified: 1781728209633
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781654232763.5
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Neon Palms Motor Lodge",
+                        "location": "Detroit, MI",
+                        "price": 0,
+                        "description": "Authentic mid-century aesthetic with fully restored neon signage.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: >-
+                    insomnia.test('Price must be greater than 0. Should return
+                    400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 09 - Description Too Short
+                meta:
+                  id: req_554eb6152c224af0a07306edf8a4ae72
+                  created: 1781656413278
+                  modified: 1781728447572
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781653878341.25
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Neon Palms Motor Lodge",
+                        "location": "Detroit, MI",
+                        "price": 110,
+                        "description": "Sweet!",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: >-
+                    insomnia.test('Description too short. Should return 400.',
+                    () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 03 - Missing Title Key
+                meta:
+                  id: req_b4812887a0434493a2fb8107261cd3ca
+                  created: 1781656432692
+                  modified: 1781728301912
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781655650452.5
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "location": "Detroit, MI",
+                        "price": 110,
+                        "description": "Authentic mid-century aesthetic with fully restored neon signage.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: |-
+                    insomnia.test('Title Missing. Should return 400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 05 - Missing Location Key
+                meta:
+                  id: req_26ae75eeae234934b59d6cf8e49da025
+                  created: 1781656458991
+                  modified: 1781728252605
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781654587185.75
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Neon Palms Motor Lodge",
+                        "price": 110,
+                        "description": "Authentic mid-century aesthetic with fully restored neon signage.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: >-
+                    insomnia.test('Location Missing. Should return 400.', () =>
+                    {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 08 - Missing Price Key
+                meta:
+                  id: req_696a94d818444e2880cf3cf7ec3d20fe
+                  created: 1781656491843
+                  modified: 1781728412123
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781654055552.375
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Neon Palms Motor Lodge",
+                        "location": "Detroit, MI",
+                        "description": "Authentic mid-century aesthetic with fully restored neon signage.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: |-
+                    insomnia.test('Price Missing. Should return 400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 07 - Negative Price
+                meta:
+                  id: req_3aca45d8c69b479484f3b700d73ec0e7
+                  created: 1781656497077
+                  modified: 1781728158798
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781654144157.9375
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Neon Palms Motor Lodge",
+                        "location": "Detroit, MI",
+                        "price": -110,
+                        "description": "Authentic mid-century aesthetic with fully restored neon signage.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: >-
+                    insomnia.test('Price Cannot be Negative. Should return 400',
+                    () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 10 - Missing Description Key
+                meta:
+                  id: req_8b717f9485564e4babea8ac05eb0a87a
+                  created: 1781656556511
+                  modified: 1781728463323
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781653701130.125
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Neon Palms Motor Lodge",
+                        "location": "Detroit, MI",
+                        "price": 110,
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: >-
+                    insomnia.test('Description Missing. Should return 400.', ()
+                    => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 02 - Short Title
+                meta:
+                  id: req_6c1de97b740744ac8e75046fec604721
+                  created: 1781656800678
+                  modified: 1781728322018
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781656004874.75
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Bob",
+                        "location": "Detroit, MI",
+                        "price": 110,
+                        "description": "Authentic mid-century aesthetic with fully restored neon signage.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: |-
+                    insomnia.test('Title Too Short. Should return 400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 12 - Missing Image Key
+                meta:
+                  id: req_9815c99cc1e74b07810ab76abd8bb1bb
+                  created: 1781656892552
+                  modified: 1781728641483
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781653701030.125
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Neon Palms Motor Lodge",
+                        "location": "Detroit, MI",
+                        "price": 110,
+                        "description": "Authentic mid-century aesthetic with fully restored neon signage."
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: >-
+                    insomnia.test('Database will add image by default. Should
+                    return status 200', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(200);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.base_url }}/motels"
+                name: 11 - Empty Image
+                meta:
+                  id: req_b04beed30a2e4aa2a2366bba0dd4def6
+                  created: 1781656911991
+                  modified: 1781728602651
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781653701080.125
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Neon Palms Motor Lodge",
+                        "location": "Detroit, MI",
+                        "price": 110,
+                        "description": "Authentic mid-century aesthetic with fully restored neon signage.",
+                        "image": ""
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  afterResponse: |-
+                    insomnia.test('Image URL Empty. Should return 400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+      - name: Update Operations
+        meta:
+          id: fld_d986f06c6ad1495aae53c3785897ec6b
+          created: 1781652385194
+          modified: 1781757078605
+          sortKey: -1781652385269
+          description: ""
+        children:
+          - url: "{{ _.base_url }}/motels/{{active_test_id}}/edit"
+            name: 01 - Load Edit Form
+            meta:
+              id: req_79f998f0b70144bb8d9ab9ae4dacf380
+              created: 1781713757809
+              modified: 1781741210064
+              isPrivate: false
+              description: ""
+              sortKey: -1781713757809
+            method: GET
+            headers:
+              - name: Accept
+                value: text/html
+                description: ""
+                disabled: false
+            scripts:
+              preRequest: >-
+                const currentId = insomnia.environment.get("active_test_id");
+
+
+                if (!currentId) {
+                    insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                        insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                    });
+                }
+              afterResponse: >
+                insomnia.test('Should give us the Edit form populated with data.
+                Returns 200', () => {
+                	insomnia.expect(insomnia.response.code).to.equal(200);
+                });
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/motels/{{active_test_id}}"
+            name: 02 - Submit Valid Update Data
+            meta:
+              id: req_8763c72b762d4ac38f1245af5d31ab94
+              created: 1781720878857
+              modified: 1781755992438
+              isPrivate: false
+              description: ""
+              sortKey: -1781683135265
+            method: PUT
+            body:
+              mimeType: application/json
+              text: >-
+                {
+                  "motel": {
+                    "title": "Title Edited",
+                    "location": "Location Edited",
+                    "price": 2,
+                    "description": "Description Edited no changes to the IMAGE will be made.",
+                    "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                  }
+                }
+            parameters:
+              - name: _method
+                value: PUT
+                description: ""
+                disabled: true
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: Accept
+                value: text/html
+                description: ""
+                disabled: false
+            scripts:
+              preRequest: >-
+                const currentId = insomnia.environment.get("active_test_id");
+
+
+                if (!currentId) {
+                    insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                        insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                    });
+                }
+              afterResponse: >-
+                insomnia.test('Should submit updated data to DB. Code 302', ()
+                => {
+                	insomnia.expect(insomnia.response.code).to.equal(302);
+                });
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: off
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - name: Validation Failures
+            meta:
+              id: fld_47c1e137e5ea465b80eae71b09a773a0
+              created: 1781652512721
+              modified: 1781757078605
+              sortKey: -1781652512721
+              description: ""
+            children:
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 01 - Empty Title
+                meta:
+                  id: req_a8492af2c3524d9e81ef02ec9fbef07f
+                  created: 1781727189838
+                  modified: 1781738975236
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781727197569
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "",
+                        "location": "Location Edited",
+                        "price": 2,
+                        "description": "Description Edited and long Enought. No changes to the image will be made.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                parameters:
+                  - name: _method
+                    value: PUT
+                    description: ""
+                    disabled: true
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: >-
+                    insomnia.test('Title cannot be empty. Should return 400.',
+                    () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 03 - Missing Title Key
+                meta:
+                  id: req_4c3137d6bd9740068cf747e5f3998c33
+                  created: 1781727559736
+                  modified: 1781738984510
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781720477689
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "location": "Location Edited",
+                        "price": 2,
+                        "description": "Description Edited and long Enought. No changes to the image will be made.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                parameters:
+                  - name: _method
+                    value: PUT
+                    description: ""
+                    disabled: true
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: >-
+                    insomnia.test('Title cannot be missing. Should return 400.',
+                    () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 02 - Short Title
+                meta:
+                  id: req_9f5665a39fa740048bd4932c00bf6344
+                  created: 1781727830770
+                  modified: 1781738979910
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781723837629
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Bob",
+                        "location": "Location Edited",
+                        "price": 2,
+                        "description": "Description Edited and long Enought. No changes to the image will be made.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                parameters:
+                  - name: _method
+                    value: PUT
+                    description: ""
+                    disabled: true
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: >-
+                    insomnia.test('Title must be at least 4 characters. Should
+                    return 400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 04 - Empty Location
+                meta:
+                  id: req_b22694ef6467453b9584dcab38bb8dec
+                  created: 1781727865350
+                  modified: 1781738988178
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781720477589
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Title Edited",
+                        "location": "",
+                        "price": 2,
+                        "description": "Description Edited. No changes to the image will be made.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                parameters:
+                  - name: _method
+                    value: PUT
+                    description: ""
+                    disabled: true
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: >-
+                    insomnia.test('Location cannot be empty. Should return
+                    400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 05 - Missing Location Key
+                meta:
+                  id: req_1bf8142642914994a20502fbd3891e22
+                  created: 1781727950541
+                  modified: 1781738993110
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781717117699
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Title Edited",
+                        "price": 2,
+                        "description": "Description Edited. No changes to the image will be made.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                parameters:
+                  - name: _
+                    value: PUT
+                    description: ""
+                    disabled: true
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: >-
+                    insomnia.test('Location Key Missing. Should return 400.', ()
+                    => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 06 - Price of Zero
+                meta:
+                  id: req_fe5abea4b9134a00b1dc61ca92502cf5
+                  created: 1781728077979
+                  modified: 1781729591948
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781717117599
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Title Edited",
+                        "location": "Location Edited",
+                        "price": 0,
+                        "description": "Description Edited. No changes to the image will be made.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: >-
+                    insomnia.test('Price cannot be 0. Should return 400.', () =>
+                    {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 07 - Negative Price
+                meta:
+                  id: req_900bdc595c6d426fa099b2b22e7757ee
+                  created: 1781729028962
+                  modified: 1781729572190
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781715437704
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Title Edited",
+                        "location": "Location Edited",
+                        "price": -2,
+                        "description": "Description Edited. No changes to the image will be made.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: >-
+                    insomnia.test('Price cannot be negative. Should return
+                    400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 08 - Missing Price Key
+                meta:
+                  id: req_5eee55d933354603a43d896026552d65
+                  created: 1781729057890
+                  modified: 1781729556588
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781714597756.5
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Title Edited",
+                        "location": "Location Edited",
+                        "description": "Description Edited. No changes to the image will be made.",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: >-
+                    insomnia.test('Price Key Missing. Should return 400.', () =>
+                    {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 09 - Description Too Short
+                meta:
+                  id: req_2c0a0add6adf42fd84fa75bc5115f9f0
+                  created: 1781729225316
+                  modified: 1781729688758
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781714597656.5
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Title Edited",
+                        "location": "Location Edited",
+                        "price": 2,
+                        "description": "Des",
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: >-
+                    insomnia.test('Description shorter than 10 characters.
+                    Should return 400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 10 - Missing Description Key
+                meta:
+                  id: req_c2bd33f6c70f48e597bda9bf2e3ff105
+                  created: 1781729263652
+                  modified: 1781729509110
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781714177732.75
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "Title Edited",
+                        "location": "Location Edited",
+                        "price": 2,
+                        "image": "https://images.unsplash.com/photo-1776142519459-026e785a8c8e?auto=format&fit=crop&w=1200&q=80"
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: >-
+                    insomnia.test('Description Key missing. Should return 400.',
+                    () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{base_url}}/motels/{{active_test_id}}"
+                name: 11 - Empty Image
+                meta:
+                  id: req_17a8e0c1adf24c01877ad24a91585aa8
+                  created: 1781729414749
+                  modified: 1781729484111
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1781714177632.75
+                method: PUT
+                body:
+                  mimeType: application/json
+                  text: >-
+                    {
+                      "motel": {
+                        "title": "",
+                        "location": "Location Edited",
+                        "price": 2,
+                        "description": "Description Edited and long Enought. No changes to the image will be made.",
+                        "image": ""
+                      }
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                scripts:
+                  preRequest: >-
+                    const currentId =
+                    insomnia.environment.get("active_test_id");
+
+
+                    if (!currentId) {
+                        insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                            insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                        });
+                    }
+                  afterResponse: |-
+                    insomnia.test('Empty Image. Should return 400.', () => {
+                    	insomnia.expect(insomnia.response.code).to.equal(400);
+                    });
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+      - name: Delete Operations
+        meta:
+          id: fld_8c65a64b3a704a7089dac732dd8e2bd5
+          created: 1781729766300
+          modified: 1781757078706
+          sortKey: -1781652385244
+          description: ""
+        children:
+          - url: "{{base_url}}/motels/{{active_test_id}}"
+            name: 01 - Delete Motel
+            meta:
+              id: req_306849182afa4462989f595b8238ce4f
+              created: 1781729819025
+              modified: 1781757046551
+              isPrivate: false
+              description: ""
+              sortKey: -1781729819025
+            method: DELETE
+            scripts:
+              preRequest: >-
+                const currentId = insomnia.environment.get("active_test_id");
+
+
+                if (!currentId) {
+                    insomnia.test('🛑 PIPELINE CIRCUIT BREAKER', () => {
+                        insomnia.expect.fail("Execution halted: This request requires a live database document. Run the full collection sequence starting from '02 - Create New'!");
+                    });
+                }
+              afterResponse: >-
+                insomnia.test('Should delete our motel and issue redirect.
+                Should return 302.', () => {
+                	insomnia.expect(insomnia.response.code).to.equal(302);
+                });
+
+
+                if (insomnia.response.code === 302) {
+                	insomnia.environment.unset("active_test_id");
+                	insomnia.environment.unset("active_show_id");
+                }
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: off
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_52c4fd19a0e1d07a438574adb0cbb4b27590c84f
+    created: 1781651824700
+    modified: 1781757078704
+environments:
+  name: Base Environment
+  meta:
+    id: env_52c4fd19a0e1d07a438574adb0cbb4b27590c84f
+    created: 1781651824699
+    modified: 1781757078705
+    isPrivate: false
+  subEnvironments:
+    - name: VacancyVibe
+      meta:
+        id: env_1d1d8381e8bf4e3982aae0844b83eebb
+        created: 1781653199366
+        modified: 1781757078705
+        isPrivate: false
+        sortKey: 1781653199366
+      data:
+        base_url: http://127.0.0.1:3232
+      color: "#75c328"
