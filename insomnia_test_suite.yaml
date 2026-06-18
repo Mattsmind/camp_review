@@ -34,7 +34,7 @@ collection:
     meta:
       id: fld_83d161bb9b0e4b889d281d5faa71b845
       created: 1781652345525
-      modified: 1781757078706
+      modified: 1781817430548
       sortKey: -1781652345525
       description: ""
     children:
@@ -105,7 +105,7 @@ collection:
         meta:
           id: fld_1a4fa4949c024706b9a31c1d2413aaac
           created: 1781652363623
-          modified: 1781757077582
+          modified: 1781817429359
           sortKey: -1781652385294
           description: ""
         children:
@@ -190,7 +190,7 @@ collection:
             meta:
               id: fld_85882029887f4636925448434bf5db13
               created: 1781652434793
-              modified: 1781757077583
+              modified: 1781817429359
               sortKey: -1781652434793
               description: ""
             children:
@@ -580,7 +580,7 @@ collection:
                 meta:
                   id: req_9815c99cc1e74b07810ab76abd8bb1bb
                   created: 1781656892552
-                  modified: 1781728641483
+                  modified: 1781813258501
                   isPrivate: false
                   description: ""
                   sortKey: -1781653701030.125
@@ -603,8 +603,24 @@ collection:
                   afterResponse: >-
                     insomnia.test('Database will add image by default. Should
                     return status 200', () => {
-                    	insomnia.expect(insomnia.response.code).to.equal(200);
+                        insomnia.expect(insomnia.response.code).to.equal(200);
                     });
+
+
+                    if (insomnia.response.code === 200) {
+                        const htmlBody = insomnia.response.body.toString();
+                        const idMatch = htmlBody.match(/\/motels\/([0-9a-fA-F]{24})/);
+                        
+                        if (idMatch && idMatch[1]) {
+                            const newId = idMatch[1];
+
+                            insomnia.environment.set('default_image_test_id', newId);
+                        } else {
+                            insomnia.test('🛑 SCRAPE FAILURE (DEFAULT IMAGE)', () => {
+                                insomnia.expect.fail("Successfully loaded page, but could not locate the 24-character Mongoose ID inside the rendered HTML source code.");
+                            });
+                        }
+                    }
                 settings:
                   renderRequestBody: true
                   encodeUrl: true
@@ -655,7 +671,7 @@ collection:
         meta:
           id: fld_d986f06c6ad1495aae53c3785897ec6b
           created: 1781652385194
-          modified: 1781757078605
+          modified: 1781817430470
           sortKey: -1781652385269
           description: ""
         children:
@@ -758,7 +774,7 @@ collection:
             meta:
               id: fld_47c1e137e5ea465b80eae71b09a773a0
               created: 1781652512721
-              modified: 1781757078605
+              modified: 1781817430470
               sortKey: -1781652512721
               description: ""
             children:
@@ -1325,7 +1341,7 @@ collection:
         meta:
           id: fld_8c65a64b3a704a7089dac732dd8e2bd5
           created: 1781729766300
-          modified: 1781757078706
+          modified: 1781817430548
           sortKey: -1781652385244
           description: ""
         children:
@@ -1334,7 +1350,7 @@ collection:
             meta:
               id: req_306849182afa4462989f595b8238ce4f
               created: 1781729819025
-              modified: 1781757046551
+              modified: 1781813658624
               isPrivate: false
               description: ""
               sortKey: -1781729819025
@@ -1352,13 +1368,34 @@ collection:
               afterResponse: >-
                 insomnia.test('Should delete our motel and issue redirect.
                 Should return 302.', () => {
-                	insomnia.expect(insomnia.response.code).to.equal(302);
+                    insomnia.expect(insomnia.response.code).to.equal(302);
                 });
 
 
                 if (insomnia.response.code === 302) {
-                	insomnia.environment.unset("active_test_id");
-                	insomnia.environment.unset("active_show_id");
+                    const baseUrl = insomnia.environment.get('base_url');
+                    const defaultImageId = insomnia.environment.get('default_image_test_id');
+
+                    if (defaultImageId) {
+                        // Send a clean, native HTTP DELETE request directly to the endpoint
+                        const deleteUrl = `${baseUrl}/motels/${defaultImageId}`;
+                        
+                        insomnia.sendRequest({
+                            url: deleteUrl,
+                            method: 'DELETE' 
+                        }, (err, res) => {
+                            if (err) {
+                                console.error('⚠️ Background teardown failed:', err);
+                            } else {
+                                console.log('🧹 Background teardown successful for ID:', defaultImageId);
+                            }
+                        });
+                    }
+
+                    // Wipe out the environment variables
+                    insomnia.environment.unset("active_test_id");
+                    insomnia.environment.unset("active_show_id");
+                    insomnia.environment.unset("default_image_test_id");
                 }
             settings:
               renderRequestBody: true
@@ -1373,20 +1410,20 @@ cookieJar:
   meta:
     id: jar_52c4fd19a0e1d07a438574adb0cbb4b27590c84f
     created: 1781651824700
-    modified: 1781757078704
+    modified: 1781817430546
 environments:
   name: Base Environment
   meta:
     id: env_52c4fd19a0e1d07a438574adb0cbb4b27590c84f
     created: 1781651824699
-    modified: 1781757078705
+    modified: 1781817430547
     isPrivate: false
   subEnvironments:
     - name: VacancyVibe
       meta:
         id: env_1d1d8381e8bf4e3982aae0844b83eebb
         created: 1781653199366
-        modified: 1781757078705
+        modified: 1781817430547
         isPrivate: false
         sortKey: 1781653199366
       data:

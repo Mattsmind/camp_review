@@ -3,7 +3,7 @@ const router = express.Router();
 const motels = require('../controllers/motels');
 
 const validateForm = require('../middleware/validateForm');
-const { motelSchema, objectIdSchema } = require('../schemas');
+const { motelSchema, objectIdSchema } = require('../validationSchemas');
 
 router.route('/')
     .get(motels.index)
