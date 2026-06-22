@@ -24,7 +24,7 @@ module.exports.createMotel = async (req, res, next) => {
 
 module.exports.showMotel = async (req, res, next) => {
     const { id } = req.params;
-    const motel = await Motel.findById(id);
+    const motel = await Motel.findById(id).populate('reviews');
 
     if (!motel) {
         return next(new AppError('That motel could not be found', 404));

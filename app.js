@@ -9,6 +9,7 @@ const globalErrorHandler = require('./middleware/errorMiddleware');
 const AppError = require('./utils/AppError')
 
 const motelRoutes = require('./routes/motels');
+const reviewRoutes = require('./routes/reviews');
 
 app.engine('ejs', engine)
 app.set('view engine', 'ejs')
@@ -25,6 +26,7 @@ app.get( '/favicon.ico', (req, res) => res.status(204).end() );
 app.get('/', (req, res) => res.render('home', { pageTitle: 'Home'}) );
 
 app.use('/motels', motelRoutes);
+app.use('/motels/:id/reviews', reviewRoutes);
 
 app.all(/.*/, (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
