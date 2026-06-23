@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const motelSchema = Joi.object({
+module.exports.motelSchema = Joi.object({
     motel: Joi.object({
         title: Joi.string().required().min(4),
         price: Joi.number().required().min(0.01),
@@ -10,11 +10,3 @@ const motelSchema = Joi.object({
     }).required()
 });
 
-const objectIdSchema = Joi.object({
-    id: Joi.string().hex().length(24).required()
-});
-
-module.exports = { 
-    motelSchema,
-    objectIdSchema
-};

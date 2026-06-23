@@ -4,7 +4,10 @@ require('dotenv').config({path: require('path').resolve(__dirname, '../.env')});
 const cities = require('./cities');
 const { prefixes, cores, suffixes } = require('./nameData');
 const { motelImages, atmospheres } = require('./descriptions');
+const { sampleReviews } = require('./sampleReviews')
+
 const Motel = require('../models/motel');
+const Review = require('../models/review');
 
 const numberOfSeeds = 50;
 const randomChange = [.00, .99, .79, .75, .50, .49];
@@ -20,6 +23,7 @@ const sample = array => array[Math.floor(Math.random() * array.length)];
 
 const seedDB = async (num) => {
     await Motel.deleteMany({});
+    await Review.deleteMany({});
     console.log("Existing collections cleared.");
 
     for (let i = 0; i < num; i++) {
@@ -35,9 +39,20 @@ const seedDB = async (num) => {
             geometry: {
                 type: "Point",
                 coordinates: [city.longitude, city.latitude]
-            }
+            },
+            reviews: []
         });
         
+        const reviewCount = Math.floor(Math.random() * 7);
+        for (let j = 0; j < reviewCount; j++) {
+            const newReview = new Review({
+                body: sample(sampleReviews),
+                rating: Math.floor(Math.random() * 5) + 1
+            });
+            await newReview.save();
+            motel.reviews.push(newReview._id);
+        }
+
         await motel.save();
     }
 };
