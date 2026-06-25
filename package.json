@@ -1,6 +1,6 @@
 {
   "name": "vacancy-vibe",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A vintage roadside motel review directory application.",
   "keywords": [
     "express",
