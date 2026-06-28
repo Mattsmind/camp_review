@@ -7,6 +7,7 @@ const engine = require('ejs-mate');
 const { requestLogger, errorLogger } = require('./middleware/eventLogger');
 const globalErrorHandler = require('./middleware/errorMiddleware');
 const AppError = require('./utils/AppError')
+const sessionMiddleware = require('./middleware/sessions');
 
 const motelRoutes = require('./routes/motels');
 const reviewRoutes = require('./routes/reviews');
@@ -16,11 +17,11 @@ app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(requestLogger);
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
-app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(sessionMiddleware);
 
 app.get( '/favicon.ico', (req, res) => res.status(204).end() );
 app.get('/', (req, res) => res.render('home', { pageTitle: 'Home'}) );
