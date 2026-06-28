@@ -60,6 +60,6 @@ const seedDB = async (num) => {
 seedDB(numberOfSeeds)
     .then(() => {
         mongoose.connection.close();
-        console.log(`Successfully compiled and seeded database with ${numberOfSeeds} records! 🚗💨`);
+        console.log(`Successfully compiled and seeded database with ${numberOfSeeds} records!`);
     })
     .catch(err => console.error('Seeding process failed:', err));
