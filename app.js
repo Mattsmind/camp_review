@@ -3,11 +3,13 @@ const app = express();
 const path = require('path');
 const methodOverride = require('method-override');
 const engine = require('ejs-mate');
+const flash = require('connect-flash');
 
 const { requestLogger, errorLogger } = require('./middleware/eventLogger');
 const globalErrorHandler = require('./middleware/errorMiddleware');
 const AppError = require('./utils/AppError')
 const sessionMiddleware = require('./middleware/sessions');
+
 
 const motelRoutes = require('./routes/motels');
 const reviewRoutes = require('./routes/reviews');
@@ -22,6 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(sessionMiddleware);
+app.use(flash());
+app.use(require('./middleware/flashMessages'));
 
 app.get( '/favicon.ico', (req, res) => res.status(204).end() );
 app.get('/', (req, res) => res.render('home', { pageTitle: 'Home'}) );

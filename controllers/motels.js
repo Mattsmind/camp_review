@@ -19,6 +19,7 @@ module.exports.createMotel = async (req, res, next) => {
     const newCamp =  new Motel(req.body.motel);
     const createCamp = await newCamp.save();
 
+    req.flash('success', 'Successfully created new Vacancy Vibe!');
     res.redirect(`/motels/${newCamp._id}`);
 };
 
@@ -53,6 +54,7 @@ module.exports.updateMotel = async (req, res, next) => {
         return next(new AppError('Could not find the camp to update!', 404));
     }
 
+    req.flash('success', 'Successfully updated the motel!');
     res.redirect(`/motels/${id}`);
 };
 
@@ -64,5 +66,6 @@ module.exports.deleteMotel = async (req, res, next) => {
         return next(new AppError('The motel could not be found.', 404))
     }
     
+    req.flash('success', 'Motel deleted successfully!');
     res.redirect('/motels');
 };
