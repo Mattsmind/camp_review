@@ -16,6 +16,7 @@ module.exports.createReview = async (req, res, next) => {
     motel.reviews.push(review._id);
     await motel.save();
 
+    req.flash('success', 'Review created successfully!');
     res.redirect(`/motels/${motel._id}`);
 };
 
@@ -24,16 +25,17 @@ module.exports.deleteReview = async (req, res, next) => {
     
     const motel = await Motel.findById(id);
     if (!motel) {
-        throw new AppError('Motel Not Found.', 404);
+        return next(new AppError('Motel Not Found.', 404));
     }
 
     const review = await Review.findById(reviewId);
     if (!review) {
-        throw new AppError('Review Not Found.', 404);
+        return next(new AppError('Review Not Found.', 404));
     }
 
     await Motel.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
     await Review.findByIdAndDelete(reviewId);
 
+    req.flash('success', 'Review deleted successfully!');
     res.redirect(`/motels/${id}`);
 }

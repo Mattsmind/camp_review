@@ -1,7 +1,7 @@
 const AppError = require('../utils/AppError');
 
 const handleCastErrorDB = (err) => {
-    return new AppError(`Invalid ${err.path}: ${err.value}.`, 400);
+    return new AppError(`Invalid ${err.path}: ${err.value}.`, 400, '/motels');
 };
 
 const handleDuplicateFieldsDB = (err) => {
@@ -24,6 +24,11 @@ module.exports = (err, req, res, next) => {
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
     if (error.name === 'ValidationError') error = handleValidationErrorDB(error);
+
+    if (error.redirectUrl) {
+        req.flash('error', error.message);
+        return res.redirect(error.redirectUrl);
+    }
 
     const currentEnv = (process.env.NODE_ENV || 'production').toLowerCase().trim();
     const isDev = currentEnv === 'development' || currentEnv === 'dev';
