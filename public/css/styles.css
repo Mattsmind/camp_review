@@ -4,3 +4,35 @@
   -webkit-box-orient: vertical;  
   overflow: hidden;
 }
+
+/* FLASH MESSAGES */
+.flash-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1060; 
+  max-width: 350px;
+  width: 100%;
+}
+
+.custom-flash {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(4px); 
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+.alert-success.custom-flash {
+  border-left: 5px solid #198754;
+  color: #0f5132;
+}
+.alert-danger.custom-flash {
+  border-left: 5px solid #dc3545;
+  color: #842029;
+}
+.alert-info.custom-flash {
+  border-left: 5px solid #0d6efd;
+  color: #055160;
+}
