@@ -7,7 +7,7 @@ module.exports.createReview = async (req, res, next) => {
     const motel = await Motel.findById(id);
 
     if (!motel) {
-        return next(new AppError('Motel not found', 404));
+        return next(new AppError('Motel not found', 404, '/motels'));
     }
 
     const review = new Review(req.body.review);
@@ -25,12 +25,12 @@ module.exports.deleteReview = async (req, res, next) => {
     
     const motel = await Motel.findById(id);
     if (!motel) {
-        return next(new AppError('Motel Not Found.', 404));
+        return next(new AppError('Motel Not Found.', 404, '/motels'));
     }
 
     const review = await Review.findById(reviewId);
     if (!review) {
-        return next(new AppError('Review Not Found.', 404));
+        return next(new AppError('Review Not Found.', 404, '/motels'));
     }
 
     await Motel.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });

@@ -28,7 +28,7 @@ module.exports.showMotel = async (req, res, next) => {
     const motel = await Motel.findById(id).populate('reviews');
 
     if (!motel) {
-        return next(new AppError('That motel could not be found', 404));
+        return next(new AppError('That motel could not be found', 404, '/motels'));
     }
 
     res.render('motels/details', { pageTitle: motel.title, motel });
@@ -39,7 +39,7 @@ module.exports.renderEditForm = async (req, res, next) => {
     const updateCamp = await Motel.findById(id);
 
     if (!updateCamp) {
-        return next(new AppError('The motel you want to update, could not be found.', 404));
+        return next(new AppError('The motel you want to update, could not be found.', 404, '/motels'));
     }
 
     res.render('motels/update', { pageTitle: 'Edit & Update', motel: updateCamp });
@@ -51,7 +51,7 @@ module.exports.updateMotel = async (req, res, next) => {
     const updatedCamp = await Motel.findByIdAndUpdate(id, motel, { runValidators: true });
 
     if (!updatedCamp) {
-        return next(new AppError('Could not find the camp to update!', 404));
+        return next(new AppError('Could not find the camp to update!', 404, '/motels'));
     }
 
     req.flash('success', 'Successfully updated the motel!');
@@ -63,7 +63,7 @@ module.exports.deleteMotel = async (req, res, next) => {
     const deleteCamp = await Motel.findByIdAndDelete(id)
 
     if (!deleteCamp) {
-        return next(new AppError('The motel could not be found.', 404))
+        return next(new AppError('The motel could not be found.', 404, '/motels'));
     }
     
     req.flash('success', 'Motel deleted successfully!');
